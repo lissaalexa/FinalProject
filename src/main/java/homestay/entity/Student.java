@@ -1,14 +1,19 @@
 package homestay.entity;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -18,17 +23,27 @@ import lombok.ToString;
 public class Student {
 	@Id
     @GeneratedValue (strategy = GenerationType.IDENTITY)
+	@Column(name = "student_id") // Map the host_id column
     private Long studentId;
     private String studentFirstName;
     private String studentLastName;
     private LocalDate studentDateOfBirth;
 	private String studentCountry;
     
+	@EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    @OneToMany(mappedBy = "student", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Booking> bookings = new HashSet<>();
+
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "booking_id")
-    private Booking booking;
+    @ManyToMany(cascade = CascadeType.PERSIST)
+    @JoinTable(
+        name = "preference_student",
+        joinColumns = @JoinColumn(name = "student_id", referencedColumnName = "student_id"),
+        inverseJoinColumns = @JoinColumn(name = "preference_id", referencedColumnName = "preference_id")
+    )
+    private Set<Preference> preferences = new HashSet<>();
     
     public Long getStudentId() {
     	return studentId;

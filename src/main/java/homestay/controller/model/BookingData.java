@@ -17,8 +17,6 @@ public class BookingData {
 
     public BookingData(Booking booking) {
     	bookingId = booking.getBookingId();
-	    hostId = booking.getHostId();
-	    studentId = booking.getStudentId();
 	    startDate = booking.getStartDate();
 	    endDate = booking.getEndDate();
     }

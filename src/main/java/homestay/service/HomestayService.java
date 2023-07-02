@@ -1,5 +1,6 @@
 package homestay.service;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 
@@ -8,36 +9,215 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import homestay.controller.model.BookingData;
+import homestay.controller.model.HostFamilyData;
+import homestay.controller.model.PreferenceData;
+import homestay.controller.model.StudentData;
 import homestay.dao.BookingDao;
+import homestay.dao.HostFamilyDao;
+import homestay.dao.PreferenceDao;
+import homestay.dao.StudentDao;
 import homestay.entity.Booking;
+import homestay.entity.HostFamily;
+import homestay.entity.Preference;
+import homestay.entity.Student;
 
 @Service
 public class HomestayService {
-	
-	@Autowired
-	private BookingDao bookingDao;
-	//@Autowired
-	//private HostFamilyDao hostFamilyDao;
-	//@Autowired
-	//private StudentDao studentDao;
-	//@Autowired
-	//private PreferenceDao preferenceDao;
 
-	@Transactional(readOnly = false)
-	public BookingData saveBooking(BookingData bookingData) {
-		Long bookingId = bookingData.getBookingId();
-		Booking booking = findOrCreateBooking (bookingId);
-	
-		if(Objects.isNull(bookingId)) {
-			booking = new Booking();	
-		} else {
-			booking = findBookingById(bookingId);
-		}
-		return bookingData;
-	}
+    @Autowired
+    private BookingDao bookingDao;
 
-	private Booking findBookingById(Long bookingId) {
-		return bookingDao.findById(bookingId)
-				.orElseThrow(() -> new NoSuchElementException("Booking with ID=" + bookingId + " was not found."));
-	}
+    @Autowired
+    private HostFamilyDao hostFamilyDao;
+
+    @Autowired
+    private StudentDao studentDao;
+
+    @Autowired
+    private PreferenceDao preferenceDao;
+
+    @Transactional(readOnly = false)
+    public BookingData createBooking(BookingData bookingData) {
+        Long bookingId = bookingData.getBookingId();
+        Booking booking = findOrCreateBooking(bookingId);
+
+        setFieldsInBooking(booking, bookingData);
+        return new BookingData(bookingDao.save(booking));
+    }
+
+    private void setFieldsInBooking(Booking booking, BookingData bookingData) {
+        booking.setStartDate(bookingData.getStartDate());
+        booking.setEndDate(bookingData.getEndDate());
+    }
+
+    private Booking findOrCreateBooking(Long bookingId) {
+        Booking booking;
+
+        if (Objects.isNull(bookingId)) {
+            booking = new Booking();
+        } else {
+            booking = findBookingById(bookingId);
+        }
+        return booking;
+    }
+
+    private Booking findBookingById(Long bookingId) {
+        return bookingDao.findById(bookingId)
+                .orElseThrow(() -> new NoSuchElementException("Booking with ID=" + bookingId + " was not found."));
+    }
+
+    @Transactional(readOnly = true)
+    public List<BookingData> retrieveAllBookings() {
+        return bookingDao.findAll().stream()
+                .map(BookingData::new)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public BookingData retrieveBookingById(Long bookingId) {
+        Booking booking = findBookingById(bookingId);
+        return new BookingData(booking);
+    }
+
+    @Transactional(readOnly = false)
+    public HostFamilyData createHostFamily(HostFamilyData hostFamilyData) {
+        Long hostId = hostFamilyData.getHostId();
+        HostFamily hostFamily = findOrCreateHostFamily(hostId);
+
+        setFieldsInHostFamily(hostFamily, hostFamilyData);
+        return new HostFamilyData(hostFamilyDao.save(hostFamily));
+    }
+
+    private HostFamily findOrCreateHostFamily(Long hostId) {
+        HostFamily hostFamily;
+
+        if (Objects.isNull(hostId)) {
+            hostFamily = new HostFamily();
+        } else {
+            hostFamily = findHostFamilyById(hostId);
+        }
+        return hostFamily;
+    }
+
+    private HostFamily findHostFamilyById(Long hostId) {
+        return hostFamilyDao.findById(hostId)
+                .orElseThrow(() -> new NoSuchElementException("Host Family with ID = " + hostId + " was not found."));
+    }
+
+    private void setFieldsInHostFamily(HostFamily hostFamily, HostFamilyData hostFamilyData) {
+        hostFamily.setHostFirstName(hostFamilyData.getHostFirstName());
+        hostFamily.setHostLastName(hostFamilyData.getHostLastName());
+        hostFamily.setHostAddress(hostFamilyData.getHostAddress());
+    }
+
+    @Transactional(readOnly = true)
+    public List<HostFamilyData> retrieveAllHosts() {
+        return hostFamilyDao.findAll().stream()
+                .map(HostFamilyData::new)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public HostFamilyData retrieveHostFamilyById(Long hostId) {
+        HostFamily hostFamily = findHostFamilyById(hostId);
+        return new HostFamilyData(hostFamily);
+    }
+
+    @Transactional(readOnly = false)
+    public void deleteHostFamilyById(Long hostId) {
+        HostFamily hostFamily = findHostFamilyById(hostId);
+        hostFamilyDao.delete(hostFamily);
+    }
+
+    @Transactional(readOnly = false)
+    public StudentData createStudent(StudentData studentData) {
+        Student student = new Student();
+        setFieldsInStudent(student, studentData);
+        return new StudentData(studentDao.save(student));
+    }
+
+    private void setFieldsInStudent(Student student, StudentData studentData) {
+        student.setStudentFirstName(studentData.getStudentFirstName());
+        student.setStudentLastName(studentData.getStudentLastName());
+        student.setStudentDateOfBirth(studentData.getStudentDateOfBirth());
+        student.setStudentCountry(studentData.getStudentCountry());
+    }
+
+    @Transactional(readOnly = false)
+    public StudentData updateStudent(StudentData studentData) {
+        Long studentId = studentData.getStudentId();
+        Student student = findStudentById(studentId);
+
+        setFieldsInStudent(student, studentData);
+        return new StudentData(studentDao.save(student));
+    }
+
+    private Student findStudentById(Long studentId) {
+        return studentDao.findById(studentId)
+                .orElseThrow(() -> new NoSuchElementException("Student with ID = " + studentId + " was not found."));
+    }
+
+    @Transactional(readOnly = true)
+    public List<StudentData> retrieveAllStudents() {
+        return studentDao.findAll().stream()
+                .map(StudentData::new)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public StudentData retrieveStudentById(Long studentId) {
+        Student student = findStudentById(studentId);
+        return new StudentData(student);
+    }
+
+    @Transactional(readOnly = false)
+    public void deleteStudentById(Long studentId) {
+        Student student = findStudentById(studentId);
+        studentDao.delete(student);
+    }
+
+    @Transactional(readOnly = false)
+    public PreferenceData createPreference(PreferenceData preferenceData) {
+        Preference preference = new Preference();
+        setFieldsInPreference(preference, preferenceData);
+        return new PreferenceData(preferenceDao.save(preference));
+    }
+
+    private void setFieldsInPreference(Preference preference, PreferenceData preferenceData) {
+    	preference.setPreferenceId(preferenceData.getPreferenceId());
+        preference.setPreferenceName(preferenceData.getPreferenceName());
+    }
+
+    @Transactional(readOnly = false)
+    public PreferenceData updatePreference(PreferenceData preferenceData) {
+        Long preferenceId = preferenceData.getPreferenceId();
+        Preference preference = findPreferenceById(preferenceId);
+
+        setFieldsInPreference(preference, preferenceData);
+        return new PreferenceData(preferenceDao.save(preference));
+    }
+
+    private Preference findPreferenceById(Long preferenceId) {
+        return preferenceDao.findById(preferenceId)
+                .orElseThrow(() -> new NoSuchElementException("Preference with ID = " + preferenceId + " was not found."));
+    }
+
+    @Transactional(readOnly = true)
+    public List<PreferenceData> retrieveAllPreferences() {
+        return preferenceDao.findAll().stream()
+                .map(PreferenceData::new)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public PreferenceData retrievePreferenceById(Long preferenceId) {
+        Preference preference = findPreferenceById(preferenceId);
+        return new PreferenceData(preference);
+    }
+
+    @Transactional(readOnly = false)
+    public void deletePreferenceById(Long preferenceId) {
+        Preference preference = findPreferenceById(preferenceId);
+        preferenceDao.delete(preference);
+    }
 }

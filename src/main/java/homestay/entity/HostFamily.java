@@ -4,11 +4,12 @@ import java.util.HashSet;
 import java.util.Set;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -18,6 +19,7 @@ import lombok.ToString;
 public class HostFamily {
 	@Id
     @GeneratedValue (strategy = GenerationType.IDENTITY)
+	@Column(name = "host_id") // Map the host_id column
     private Long hostId;
     private String hostFirstName;
     private String hostLastName;
@@ -25,8 +27,8 @@ public class HostFamily {
     
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
-    @ManyToMany(mappedBy = "hosts", cascade = CascadeType.PERSIST)
-    private Set<HostFamily> hostFamily = new HashSet<>();
+    @OneToMany(mappedBy = "hostFamily", cascade = CascadeType.PERSIST)
+    private Set<Booking> bookings = new HashSet<>();
     
     public Long getHostId() {
     	return hostId;
