@@ -24,11 +24,11 @@ public class Booking {
 	private Date startDate;
 	private Date endDate;
 	
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "host_family_id", referencedColumnName = "host_id")
     private HostFamily hostFamily = new HostFamily();
     
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "student_id")
     private Student student = new Student();
     

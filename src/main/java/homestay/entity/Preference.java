@@ -28,7 +28,7 @@ public class Preference {
 
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
-    @ManyToMany(cascade = CascadeType.PERSIST)
+    @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(
         name = "preference_student",
         joinColumns = @JoinColumn(name = "preference_id", referencedColumnName = "preference_id"),

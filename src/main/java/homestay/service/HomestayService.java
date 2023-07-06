@@ -2,7 +2,7 @@ package homestay.service;
 
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -38,73 +38,63 @@ public class HomestayService {
 
     @Transactional(readOnly = false)
     public BookingData createBooking(BookingData bookingData) {
-        Long bookingId = bookingData.getBookingId();
-        Booking booking = findOrCreateBooking(bookingId);
-
+        Booking booking = new Booking();
         setFieldsInBooking(booking, bookingData);
-        return new BookingData(bookingDao.save(booking));
+        //return new BookingData(bookingDao.save(booking));
+        return new BookingData(booking.getBookingId(), booking.getHost().getHostId(),
+                booking.getStudent().getStudentId(), booking.getStartDate(), booking.getEndDate());
     }
 
     private void setFieldsInBooking(Booking booking, BookingData bookingData) {
+        booking.setHost(findHostFamilyById(bookingData.getHost()));
+        booking.setStudent(findStudentById(bookingData.getStudent()));
         booking.setStartDate(bookingData.getStartDate());
         booking.setEndDate(bookingData.getEndDate());
-    }
-
-    private Booking findOrCreateBooking(Long bookingId) {
-        Booking booking;
-
-        if (Objects.isNull(bookingId)) {
-            booking = new Booking();
-        } else {
-            booking = findBookingById(bookingId);
-        }
-        return booking;
-    }
-
-    private Booking findBookingById(Long bookingId) {
-        return bookingDao.findById(bookingId)
-                .orElseThrow(() -> new NoSuchElementException("Booking with ID=" + bookingId + " was not found."));
     }
 
     @Transactional(readOnly = true)
     public List<BookingData> retrieveAllBookings() {
         return bookingDao.findAll().stream()
-                .map(BookingData::new)
-                .toList();
+    //          .map(BookingData::new)
+        		.map(booking -> new BookingData(booking.getBookingId(),
+                        booking.getHost().getHostId(), booking.getStudent().getStudentId(),
+                        booking.getStartDate(), booking.getEndDate()))
+                .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
     public BookingData retrieveBookingById(Long bookingId) {
         Booking booking = findBookingById(bookingId);
-        return new BookingData(booking);
+    //  return new BookingData(booking);
+        return new BookingData(booking.getBookingId(), booking.getHost().getHostId(),
+                booking.getStudent().getStudentId(), booking.getStartDate(), booking.getEndDate());
+    }
+    
+    @Transactional(readOnly = false)
+    public void deleteBookingById(Long bookingId) {
+        Booking booking = findBookingById(bookingId);
+        bookingDao.delete(booking);
+    }
+    
+    @Transactional(readOnly = false)
+    public BookingData updateBooking(Long bookingId, BookingData bookingData) {
+        Booking booking = findBookingById(bookingId);
+        setFieldsInBooking(booking, bookingData);
+        Booking updatedBooking = bookingDao.save(booking);
+        return new BookingData(updatedBooking.getBookingId(), updatedBooking.getHost().getHostId(),
+                updatedBooking.getStudent().getStudentId(), updatedBooking.getStartDate(),
+                updatedBooking.getEndDate());
     }
 
     @Transactional(readOnly = false)
     public HostFamilyData createHostFamily(HostFamilyData hostFamilyData) {
-        Long hostId = hostFamilyData.getHostId();
-        HostFamily hostFamily = findOrCreateHostFamily(hostId);
-
+    	HostFamily hostFamily = new HostFamily();
         setFieldsInHostFamily(hostFamily, hostFamilyData);
         return new HostFamilyData(hostFamilyDao.save(hostFamily));
     }
 
-    private HostFamily findOrCreateHostFamily(Long hostId) {
-        HostFamily hostFamily;
-
-        if (Objects.isNull(hostId)) {
-            hostFamily = new HostFamily();
-        } else {
-            hostFamily = findHostFamilyById(hostId);
-        }
-        return hostFamily;
-    }
-
-    private HostFamily findHostFamilyById(Long hostId) {
-        return hostFamilyDao.findById(hostId)
-                .orElseThrow(() -> new NoSuchElementException("Host Family with ID = " + hostId + " was not found."));
-    }
-
     private void setFieldsInHostFamily(HostFamily hostFamily, HostFamilyData hostFamilyData) {
+    	hostFamily.setHostId(hostFamilyData.getHostId());
         hostFamily.setHostFirstName(hostFamilyData.getHostFirstName());
         hostFamily.setHostLastName(hostFamilyData.getHostLastName());
         hostFamily.setHostAddress(hostFamilyData.getHostAddress());
@@ -121,6 +111,13 @@ public class HomestayService {
     public HostFamilyData retrieveHostFamilyById(Long hostId) {
         HostFamily hostFamily = findHostFamilyById(hostId);
         return new HostFamilyData(hostFamily);
+    }
+    
+    @Transactional(readOnly = false)
+    public HostFamilyData updateHost(HostFamilyData hostFamilyData) {
+    	HostFamily hostFamily = findHostFamilyById(hostFamilyData.getHostId());
+        setFieldsInHostFamily(hostFamily, hostFamilyData);
+        return new HostFamilyData(hostFamilyDao.save(hostFamily));
     }
 
     @Transactional(readOnly = false)
@@ -145,16 +142,9 @@ public class HomestayService {
 
     @Transactional(readOnly = false)
     public StudentData updateStudent(StudentData studentData) {
-        Long studentId = studentData.getStudentId();
-        Student student = findStudentById(studentId);
-
+        Student student = findStudentById(studentData.getStudentId());
         setFieldsInStudent(student, studentData);
         return new StudentData(studentDao.save(student));
-    }
-
-    private Student findStudentById(Long studentId) {
-        return studentDao.findById(studentId)
-                .orElseThrow(() -> new NoSuchElementException("Student with ID = " + studentId + " was not found."));
     }
 
     @Transactional(readOnly = true)
@@ -184,22 +174,14 @@ public class HomestayService {
     }
 
     private void setFieldsInPreference(Preference preference, PreferenceData preferenceData) {
-    	preference.setPreferenceId(preferenceData.getPreferenceId());
         preference.setPreferenceName(preferenceData.getPreferenceName());
     }
 
     @Transactional(readOnly = false)
     public PreferenceData updatePreference(PreferenceData preferenceData) {
-        Long preferenceId = preferenceData.getPreferenceId();
-        Preference preference = findPreferenceById(preferenceId);
-
+        Preference preference = findPreferenceById(preferenceData.getPreferenceId());
         setFieldsInPreference(preference, preferenceData);
         return new PreferenceData(preferenceDao.save(preference));
-    }
-
-    private Preference findPreferenceById(Long preferenceId) {
-        return preferenceDao.findById(preferenceId)
-                .orElseThrow(() -> new NoSuchElementException("Preference with ID = " + preferenceId + " was not found."));
     }
 
     @Transactional(readOnly = true)
@@ -219,5 +201,25 @@ public class HomestayService {
     public void deletePreferenceById(Long preferenceId) {
         Preference preference = findPreferenceById(preferenceId);
         preferenceDao.delete(preference);
+    }
+
+    private Booking findBookingById(Long bookingId) {
+        return bookingDao.findById(bookingId)
+                .orElseThrow(() -> new NoSuchElementException("Booking with ID = " + bookingId + " was not found."));
+    }
+
+    private HostFamily findHostFamilyById(Long hostId) {
+        return hostFamilyDao.findById(hostId)
+                .orElseThrow(() -> new NoSuchElementException("Host Family with ID = " + hostId + " was not found."));
+    }
+
+    private Student findStudentById(Long studentId) {
+        return studentDao.findById(studentId)
+                .orElseThrow(() -> new NoSuchElementException("Student with ID = " + studentId + " was not found."));
+    }
+
+    private Preference findPreferenceById(Long preferenceId) {
+        return preferenceDao.findById(preferenceId)
+                .orElseThrow(() -> new NoSuchElementException("Preference with ID = " + preferenceId + " was not found."));
     }
 }

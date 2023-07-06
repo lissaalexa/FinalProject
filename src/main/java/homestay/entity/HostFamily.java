@@ -18,8 +18,8 @@ import lombok.ToString;
 @Data
 public class HostFamily {
 	@Id
-    @GeneratedValue (strategy = GenerationType.IDENTITY)
 	@Column(name = "host_id") // Map the host_id column
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long hostId;
     private String hostFirstName;
     private String hostLastName;
@@ -27,7 +27,7 @@ public class HostFamily {
     
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
-    @OneToMany(mappedBy = "hostFamily", cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "hostFamily", cascade = CascadeType.ALL)
     private Set<Booking> bookings = new HashSet<>();
     
     public Long getHostId() {

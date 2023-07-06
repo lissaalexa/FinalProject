@@ -22,8 +22,8 @@ import lombok.ToString;
 @Data
 public class Student {
 	@Id
-    @GeneratedValue (strategy = GenerationType.IDENTITY)
 	@Column(name = "student_id") // Map the host_id column
+    @GeneratedValue (strategy = GenerationType.IDENTITY)
     private Long studentId;
     private String studentFirstName;
     private String studentLastName;
