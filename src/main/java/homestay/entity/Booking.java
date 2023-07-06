@@ -11,6 +11,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.JoinColumn;
 import lombok.Data;
+//import jakarta.persistence.ForeignKey;
 
 @Entity
 @Data
@@ -18,16 +19,16 @@ public class Booking {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "booking_id") // Map the host_id column
+	@Column(name = "booking_id")
     private Long bookingId;
 	
 	private Date startDate;
 	private Date endDate;
 	
-    @ManyToOne(cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "host_family_id", referencedColumnName = "host_id")
-    private HostFamily hostFamily = new HostFamily();
-    
+	@ManyToOne(cascade = CascadeType.PERSIST)
+	@JoinColumn(name = "host_id", referencedColumnName = "host_id") //, foreignKey = @ForeignKey(name = "fk_booking_host"))
+	private HostFamily hostFamily = new HostFamily();
+	
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "student_id")
     private Student student = new Student();
@@ -40,11 +41,11 @@ public class Booking {
     	this.bookingId = id;
     }
     
-    public HostFamily getHost() {
+    public HostFamily getHostFamily() {
     	return hostFamily;
     }
     
-    public void setHost(HostFamily hostFamily) {
+    public void setHostFamily(HostFamily hostFamily) {
     	this.hostFamily = hostFamily;
     }
 
@@ -71,8 +72,4 @@ public class Booking {
     public void setEndDate(Date endDate) {
     	this.endDate = endDate;
     }
-
-    public HostFamily getHostFamily() {
-    	return hostFamily;
-    } 
 }

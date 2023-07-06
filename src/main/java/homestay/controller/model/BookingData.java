@@ -1,6 +1,8 @@
 package homestay.controller.model;
 
 import java.util.Date;
+
+import homestay.entity.Booking;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -8,16 +10,20 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class BookingData {
 	private Long bookingId;
-	private Long host;
-	private Long student;
+	private Long hostId;
+	private String hostName;
+	private Long studentId;
+	private String studentName;
 	private Date startDate;
 	private Date endDate;
 
-    public BookingData(Long bookingId, Long host, Long student, Date startDate, Date endDate) {
-        this.bookingId = bookingId;
-        this.host = host;
-        this.student = student;
-        this.startDate = startDate;
-        this.endDate = endDate;
+    public BookingData(Booking booking) {
+        this.bookingId = booking.getBookingId();
+        this.hostId = booking.getHostFamily().getHostId();
+        this.hostName = booking.getHostFamily().getHostFirstName() + " " + booking.getHostFamily().getHostLastName();
+        this.studentId = booking.getStudent().getStudentId();
+        this.studentName = booking.getStudent().getStudentFirstName() + " " + booking.getStudent().getStudentLastName();
+        this.startDate = booking.getStartDate();
+        this.endDate = booking.getEndDate();
     }
 }

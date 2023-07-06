@@ -22,7 +22,7 @@ import lombok.ToString;
 @Data
 public class Student {
 	@Id
-	@Column(name = "student_id") // Map the host_id column
+	@Column(name = "student_id")
     @GeneratedValue (strategy = GenerationType.IDENTITY)
     private Long studentId;
     private String studentFirstName;
@@ -35,7 +35,7 @@ public class Student {
     @OneToMany(mappedBy = "student", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Booking> bookings = new HashSet<>();
 
-    @EqualsAndHashCode.Exclude
+	@EqualsAndHashCode.Exclude
     @ToString.Exclude
     @ManyToMany(cascade = CascadeType.PERSIST)
     @JoinTable(

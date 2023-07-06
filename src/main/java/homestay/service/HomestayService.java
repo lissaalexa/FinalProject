@@ -40,14 +40,13 @@ public class HomestayService {
     public BookingData createBooking(BookingData bookingData) {
         Booking booking = new Booking();
         setFieldsInBooking(booking, bookingData);
-        //return new BookingData(bookingDao.save(booking));
-        return new BookingData(booking.getBookingId(), booking.getHost().getHostId(),
-                booking.getStudent().getStudentId(), booking.getStartDate(), booking.getEndDate());
+        return new BookingData(bookingDao.save(booking));
     }
 
     private void setFieldsInBooking(Booking booking, BookingData bookingData) {
-        booking.setHost(findHostFamilyById(bookingData.getHost()));
-        booking.setStudent(findStudentById(bookingData.getStudent()));
+    	booking.setBookingId(bookingData.getBookingId());
+        booking.setHostFamily(findHostFamilyById(bookingData.getHostId()));
+        booking.setStudent(findStudentById(bookingData.getStudentId()));
         booking.setStartDate(bookingData.getStartDate());
         booking.setEndDate(bookingData.getEndDate());
     }
@@ -56,9 +55,7 @@ public class HomestayService {
     public List<BookingData> retrieveAllBookings() {
         return bookingDao.findAll().stream()
     //          .map(BookingData::new)
-        		.map(booking -> new BookingData(booking.getBookingId(),
-                        booking.getHost().getHostId(), booking.getStudent().getStudentId(),
-                        booking.getStartDate(), booking.getEndDate()))
+        		.map(booking -> new BookingData(booking))
                 .collect(Collectors.toList());
     }
 
@@ -66,8 +63,7 @@ public class HomestayService {
     public BookingData retrieveBookingById(Long bookingId) {
         Booking booking = findBookingById(bookingId);
     //  return new BookingData(booking);
-        return new BookingData(booking.getBookingId(), booking.getHost().getHostId(),
-                booking.getStudent().getStudentId(), booking.getStartDate(), booking.getEndDate());
+        return new BookingData(booking);
     }
     
     @Transactional(readOnly = false)
@@ -81,9 +77,7 @@ public class HomestayService {
         Booking booking = findBookingById(bookingId);
         setFieldsInBooking(booking, bookingData);
         Booking updatedBooking = bookingDao.save(booking);
-        return new BookingData(updatedBooking.getBookingId(), updatedBooking.getHost().getHostId(),
-                updatedBooking.getStudent().getStudentId(), updatedBooking.getStartDate(),
-                updatedBooking.getEndDate());
+        return new BookingData(updatedBooking);
     }
 
     @Transactional(readOnly = false)
