@@ -9,17 +9,17 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class StudentData {
-	private Long studentId;
-    private String studentFirstName;
-    private String studentLastName;
-    private LocalDate studentDateOfBirth;
-	private String studentCountry;
+	private Long studentId;			//unique identifier for the student
+    private String studentFirstName;	//first name of the student
+    private String studentLastName;		//last name of the student
+    private LocalDate studentDateOfBirth;	//date of birth of the student
+	private String studentCountry;		//the country the student is from
 	
     public StudentData(Student student) {
-    	studentId = student.getStudentId();
-	    studentFirstName = student.getStudentFirstName();
-	    studentLastName = student.getStudentLastName();
-	    studentDateOfBirth = student.getStudentDateOfBirth();
-	    studentCountry = student.getStudentCountry();
+    	studentId = student.getStudentId();		//set the student ID from the provided Student entity
+	    studentFirstName = student.getStudentFirstName();	//set the student's first name from the provided Student entity
+	    studentLastName = student.getStudentLastName();		//set the student's last name from the provided Student entity
+	    studentDateOfBirth = student.getStudentDateOfBirth();	//set the student's date of birth from the provided Student entity
+	    studentCountry = student.getStudentCountry();		//set the student's country from the provided Student entity
     }
 }

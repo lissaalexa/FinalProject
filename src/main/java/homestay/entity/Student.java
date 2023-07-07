@@ -24,27 +24,29 @@ public class Student {
 	@Id
 	@Column(name = "student_id")
     @GeneratedValue (strategy = GenerationType.IDENTITY)
-    private Long studentId;
-    private String studentFirstName;
-    private String studentLastName;
-    private LocalDate studentDateOfBirth;
-	private String studentCountry;
+    private Long studentId;				//unique identifier for the student
+    private String studentFirstName;	//first name of the student
+    private String studentLastName;		//last name of the student
+    private LocalDate studentDateOfBirth;	//date of birth of the student
+	private String studentCountry;		//the country the student is from
     
 	@EqualsAndHashCode.Exclude
     @ToString.Exclude
     @OneToMany(mappedBy = "student", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Booking> bookings = new HashSet<>();
+    private Set<Booking> bookings = new HashSet<>();	//set of bookings associated with the student
 
 	@EqualsAndHashCode.Exclude
     @ToString.Exclude
-    @ManyToMany(cascade = CascadeType.PERSIST)
+    @ManyToMany(cascade = CascadeType.PERSIST)	//relationship with Preference entities using a many-to-many association
     @JoinTable(
-        name = "preference_student",
-        joinColumns = @JoinColumn(name = "student_id", referencedColumnName = "student_id"),
-        inverseJoinColumns = @JoinColumn(name = "preference_id", referencedColumnName = "preference_id")
+        name = "preference_student",			//name of the join table in the database
+        joinColumns = @JoinColumn(name = "student_id", referencedColumnName = "student_id"),	//column mapping for student_id
+        inverseJoinColumns = @JoinColumn(name = "preference_id", referencedColumnName = "preference_id")	//column mapping for preference_id
     )
-    private Set<Preference> preferences = new HashSet<>();
+    private Set<Preference> preferences = new HashSet<>();	//set of preferences associated with the student
     
+	//getters & setters
+	
     public Long getStudentId() {
     	return studentId;
     }

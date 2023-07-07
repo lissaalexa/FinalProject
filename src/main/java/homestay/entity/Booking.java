@@ -11,7 +11,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.JoinColumn;
 import lombok.Data;
-//import jakarta.persistence.ForeignKey;
 
 @Entity
 @Data
@@ -20,18 +19,20 @@ public class Booking {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "booking_id")
-    private Long bookingId;
+    private Long bookingId;		//unique identifier for the booking
 	
-	private Date startDate;
-	private Date endDate;
+	private Date startDate;		//start date of the booking
+	private Date endDate;		//end date of the booking
 	
 	@ManyToOne(cascade = CascadeType.PERSIST)
-	@JoinColumn(name = "host_id", referencedColumnName = "host_id") //, foreignKey = @ForeignKey(name = "fk_booking_host"))
-	private HostFamily hostFamily = new HostFamily();
+	@JoinColumn(name = "host_id", referencedColumnName = "host_id")
+	private HostFamily hostFamily = new HostFamily(); 	//host family associated with the booking
 	
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "student_id")
-    private Student student = new Student();
+    private Student student = new Student();	//student associated with the booking
+    
+    //getters & setters
     
     public Long getBookingId() {
     	return bookingId;

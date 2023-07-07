@@ -20,16 +20,18 @@ public class HostFamily {
 	@Id
 	@Column(name = "host_id")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long hostId;
-    private String hostFirstName;
-    private String hostLastName;
-    private String hostAddress;
+    private Long hostId;	//unique identifier for the host family
+	
+    private String hostFirstName;	//first name of the host family
+    private String hostLastName;	//last name of the host family
+    private String hostAddress;		//address of the host family
     
     @OneToMany(mappedBy = "hostFamily", cascade = CascadeType.ALL)
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
-    //@JoinColumn(name = "host_id", foreignKey = @ForeignKey(name = "fk_booking_host"))
-    private Set<Booking> bookings = new HashSet<>();
+    private Set<Booking> bookings = new HashSet<>();	//bookings associated with the host family
+    
+    //getters & setters
     
     public Long getHostId() {
     	return hostId;
