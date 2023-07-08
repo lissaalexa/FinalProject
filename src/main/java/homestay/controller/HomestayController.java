@@ -171,6 +171,29 @@ public class HomestayController {
         homestayService.deleteStudentById(studentId);
         return Map.of("message", "Deletion of student with ID = " + studentId + " was successful.");
     }
+    
+    @PostMapping("/student/{studentId}/preference")
+    @ResponseStatus(code = HttpStatus.CREATED)
+    //adding a preference to a student
+    public StudentData addPreferenceToStudent(@PathVariable Long studentId, @RequestBody PreferenceData preferenceData) {
+        log.info("Adding preference {} to student with ID = {}", preferenceData, studentId);
+        return homestayService.addPreferenceToStudent(studentId, preferenceData);
+    }
+    
+    @PostMapping("/student/{studentId}/preference/{preferenceId}")
+    @ResponseStatus(code = HttpStatus.CREATED)
+    //adding an existing preference to a student
+    public StudentData addExistingPreferenceToStudent(@PathVariable Long studentId, @PathVariable Long preferenceId) {
+        log.info("Adding preference with ID = {} to student with ID = {}", preferenceId, studentId);
+        return homestayService.addExistingPreferenceToStudent(studentId, preferenceId);
+    }
+
+    @DeleteMapping("/student/{studentId}/preference/{preferenceId}")
+    //removing a preference from a student
+    public StudentData removePreferenceFromStudent(@PathVariable Long studentId, @PathVariable Long preferenceId) {
+        log.info("Removing preference with ID = {} from student with ID = {}", preferenceId, studentId);
+        return homestayService.removePreferenceFromStudent(studentId, preferenceId);
+    }
 
     // **PREFERENCES**
 

@@ -173,6 +173,73 @@ public class HomestayService {
         Student student = findStudentById(studentId);
         studentDao.delete(student);
     }
+    
+    @Transactional(readOnly = false)
+    public StudentData addPreferenceToStudent(Long studentId, PreferenceData preferenceData) {
+        //retrieving the student by ID
+        Student student = findStudentById(studentId);
+
+        //creating a new preference object from the Preference data
+        Preference preference = findOrCreatePreference(preferenceData);
+
+        //adding the preference to the student's list of preferences
+        student.getPreferences().add(preference);
+
+        //saving the updated student entity
+        return new StudentData(studentDao.save(student));
+    }
+    
+    @Transactional(readOnly = false)
+    public StudentData addExistingPreferenceToStudent(Long studentId, Long preferenceId) {
+        //retrieving the student by ID
+        Student student = findStudentById(studentId);
+
+        //retrieving the preference by ID
+        Preference preference = findPreferenceById(preferenceId);
+
+        //adding preference to the student's list of preferences
+        student.getPreferences().add(preference);
+
+        //save the updated student entity
+        return new StudentData(studentDao.save(student));
+    }
+    
+    private Preference findOrCreatePreference(PreferenceData preferenceData) {
+        //checking if the preference already exists by name
+        Preference existingPreference = findPreferenceByName(preferenceData.getPreferenceName());
+
+        if (existingPreference != null) {
+            //if preference already exists, return it
+            return existingPreference;
+        } else {
+            //create new preference
+            Preference newPreference = new Preference();
+            newPreference.setPreferenceName(preferenceData.getPreferenceName());
+            return preferenceDao.save(newPreference);
+        }
+    }
+
+    @Transactional(readOnly = false)
+    public StudentData removePreferenceFromStudent(Long studentId, Long preferenceId) {
+        //retrieving the student by ID
+        Student student = findStudentById(studentId);
+
+        //finding the preference to remove
+        Preference preferenceToRemove = null;
+        for (Preference preference : student.getPreferences()) {
+            if (preference.getPreferenceId().equals(preferenceId)) {
+                preferenceToRemove = preference;
+                break;
+            }
+        }
+
+        //removing the preference from the student's list of preferences
+        if (preferenceToRemove != null) {
+            student.getPreferences().remove(preferenceToRemove);
+        }
+        //saving updated student entity
+        return new StudentData(studentDao.save(student));
+    }
 
     @Transactional(readOnly = false)
     public PreferenceData createPreference(PreferenceData preferenceData) {
@@ -184,6 +251,7 @@ public class HomestayService {
     private void setFieldsInPreference(Preference preference, PreferenceData preferenceData) {
     	//set the fields in the Preference entity based on the data provided
         preference.setPreferenceName(preferenceData.getPreferenceName());
+        preference.setPreferenceId(preferenceData.getPreferenceId());
     }
 
     @Transactional(readOnly = false)
@@ -238,5 +306,10 @@ public class HomestayService {
     	//method to find a preference by its ID
         return preferenceDao.findById(preferenceId)
                 .orElseThrow(() -> new NoSuchElementException("Preference with ID = " + preferenceId + " was not found."));
+    }
+    
+    private Preference findPreferenceByName(String preferenceName) {
+    	//method to find a preference by its Name
+        return preferenceDao.findByPreferenceName(preferenceName);
     }
 }
